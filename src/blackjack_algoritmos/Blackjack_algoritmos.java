@@ -48,7 +48,7 @@ public class Blackjack_algoritmos {
 
             // Player's turn
             while(add_cards(player_cards, player_value, cards_player) < 21 && hit()){
-                cards_player += shuffle_card(player_cards, player_value, cards_player);  // Adding cards to the player
+                cards_player += shuffle_card(player_cards, player_value, cards_player);  
                 show_cards(player_cards, player_value, cards_player, "Jugador");
             }
 
