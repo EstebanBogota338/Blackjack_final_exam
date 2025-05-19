@@ -14,32 +14,45 @@ public class Blackjack_algoritmos {
     static final String DARK_BLUE = "\u001B[34m";
     static final String RESET = "\u001B[0m";
 
-    static int stack_player = 10000;
+    static int stack_player = 1000;
     static int[] chip_values = {1, 5, 10, 20, 50, 100};
 
     public static void main(String[] args) {
         String play_again;
         System.out.println("\u001B[32mBienvenido a Blackjack\u001B[0m");
 
+        //Verifies if player still have money
         do {
             if (stack_player <= 0) {
                 System.out.println("\u001B[31mNo le queda dinero :( Fin del juego\u001B[0m");
                 break;
             }
 
+            // Ask for bet
             int bet = ask_for_deal_with_chips(stack_player);
 
+            //Cards and suite
             String[] player_cards = new String[10];
+            //Cards value
             int[] player_value = new int[10];
             String[] dealer_cards = new String[10];
             int[] dealer_value = new int[10];
+            
+            player_cards[0] = "8♠";
+            player_value[0] = 8;
+            player_cards[1] = "8♦";
+            player_value[1] = 8;
+            int cards_player = 2;
 
-            int cards_player = 0;
+
+           /* int cards_player = 0;
+            //Adds card 1 & 2
             cards_player += shuffle_card(player_cards, player_value, cards_player);
             System.out.println();
-            cards_player += shuffle_card(player_cards, player_value, cards_player);     
+            cards_player += shuffle_card(player_cards, player_value, cards_player);   */
             show_cards(player_cards, player_value, cards_player, "Jugador");
 
+            //Asks for double bet
             boolean doblado = false;
             if (cards_player == 2 && stack_player >= bet * 2) {
                 System.out.println("¿Desea doblar? (s/N)");
@@ -50,6 +63,7 @@ public class Blackjack_algoritmos {
                 }
             }
             
+            //Verifies split 
             if (!doblado && cards_player == 2 && get_card_rank(player_cards[0]).equals(get_card_rank(player_cards[1])) && stack_player >= bet * 2) {
                 System.out.println("¿Desea hacer split? (s/N)");
                 String input = sc.nextLine().trim();
@@ -62,6 +76,7 @@ public class Blackjack_algoritmos {
                 play_normal_hand(player_cards, player_value, dealer_cards, dealer_value, bet, cards_player);
             }
 
+                // Restart game
             do {
                 System.out.println("¿Quieres jugar otra mano? (s/N)");
                 play_again = sc.nextLine().trim();
@@ -77,6 +92,7 @@ public class Blackjack_algoritmos {
     }
 
     public static void play_normal_hand(String[] player_cards, int[] player_value, String[] dealer_cards, int[] dealer_value, int bet, int cards_player) {
+        stack_player -= bet;
         while (add_cards(player_cards, player_value, cards_player) < 21 && hit()) {
             cards_player += shuffle_card(player_cards, player_value, cards_player);
             show_cards(player_cards, player_value, cards_player, "Jugador");
@@ -86,7 +102,6 @@ public class Blackjack_algoritmos {
 
         if (player_total > 21) {
             System.out.println("\u001B[31mSe pasó de 21, perdió :(\u001B[0m");
-            stack_player -= bet;
         } else {
             int dealer_total = play_dealer_hand(dealer_cards, dealer_value);
             evaluate_result(player_total, dealer_total, bet);
@@ -96,9 +111,9 @@ public class Blackjack_algoritmos {
     }
 
     public static void play_double_hand(String[] player_cards, int[] player_value, String[] dealer_cards, int[] dealer_value, int bet) {
-        stack_player -= bet;
         bet *= 2;
-
+        stack_player -= bet;
+        
         int cards_player = 2;
         cards_player += shuffle_card(player_cards, player_value, cards_player);
         show_cards(player_cards, player_value, cards_player, "Jugador");
@@ -107,7 +122,6 @@ public class Blackjack_algoritmos {
 
         if (player_total > 21) {
             System.out.println("\u001B[31mSe pasó de 21, perdió :(\u001B[0m");
-            stack_player -= bet;
         } else {
             int dealer_total = play_dealer_hand(dealer_cards, dealer_value);
             evaluate_result(player_total, dealer_total, bet);
@@ -117,14 +131,17 @@ public class Blackjack_algoritmos {
     }
 
     public static void play_split_hands(String[] player_cards, int[] player_value, String[] dealer_cards, int[] dealer_value, int bet) {
-        stack_player -= bet;
+        stack_player -= bet * 2;
 
+        //Creating an aux array
         String[] player_cards2 = new String[10];
         int[] player_value2 = new int[10];
 
+        //Storing second hand's value and symbol
         player_cards2[0] = player_cards[1];
         player_value2[0] = player_value[1];
 
+        //Removing second's hand value of our original array
         player_cards[1] = null;
         player_value[1] = 0;
 
@@ -174,15 +191,14 @@ public class Blackjack_algoritmos {
         System.out.println();
         if (player > 21) {
             System.out.println("\u001B[31mTe pasaste, pierdes esta mano\u001B[0m");
-            stack_player -= bet;
         } else if (dealer > 21 || player > dealer) {
             System.out.println("\u001B[32mGanaste esta mano!\u001B[0m");
-            stack_player += bet;
+            stack_player += bet * 2;
         } else if (player < dealer) {
             System.out.println("\u001B[31mPerdiste esta mano\u001B[0m");
-            stack_player -= bet;
         } else {
             System.out.println("\u001B[33mEmpate en esta mano\u001B[0m");
+            stack_player += bet;
         }
     }
 
